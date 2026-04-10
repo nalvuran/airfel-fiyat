@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Airfel Fiyat Listesi</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#f5f6fa;color:#1a1d2e;font-family:'Inter',sans-serif;min-height:100vh;padding:12px 12px 60px}
+:root{--red:#e02020;--bg:#f5f6fa;--white:#fff;--border:#e2e4eb;--text:#1a1d2e;--muted:#6b7280;--dark:#1a1d2e}
+.header{background:linear-gradient(135deg,#c81a1a,#e02020 60%,#ff3a3a);border-radius:14px;padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(224,32,32,.3)}
+.header h1{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;color:#fff;letter-spacing:-.02em}
+.header p{font-size:.72rem;color:rgba(255,255,255,.7);margin-top:2px}
+.header-badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 10px;text-align:center;white-space:nowrap}
+.header-badge span{display:block;color:#fff;font-size:.6rem;opacity:.8;text-transform:uppercase;letter-spacing:.08em}
+.header-badge strong{color:#fff;font-size:.85rem;font-family:'Space Grotesk',sans-serif}
+.card{background:var(--white);border-radius:12px;border:1px solid var(--border);padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.card-title{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;font-weight:600}
+.search-input{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);font-family:'Inter',sans-serif;font-size:.9rem;color:var(--text);background:var(--white);outline:none}
+.search-input:focus{border-color:var(--red)}
+.search-results{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--white);border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:99;max-height:260px;overflow-y:auto}
+.search-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border)}
+.search-item:last-child{border-bottom:none}
+.search-item:active{background:#fff0f0}
+.search-item .si-label{font-size:.82rem;font-weight:600;color:var(--text)}
+.search-item .si-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+.search-item .si-price{font-size:.78rem;font-weight:700;color:var(--red);margin-top:2px}
+.search-item mark{background:#fef08a;border-radius:2px}
+.no-result{padding:12px 16px;font-size:.82rem;color:var(--muted)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.tab{flex:1;min-width:80px;padding:10px 8px;border-radius:10px;border:2px solid var(--border);background:var(--white);cursor:pointer;text-align:center;font-family:'Inter',sans-serif;font-size:.75rem;font-weight:600;color:var(--muted);transition:all .15s;user-select:none;-webkit-user-select:none}
+.tab:active{opacity:.7}
+.tab .tab-icon{font-size:1.2rem;display:block;margin-bottom:3px}
+.tab.active{border-color:var(--red);background:#fff0f0;color:var(--red)}
+.cesit-tabs{display:flex;gap:8px;margin-bottom:4px}
+.cesit-tab{flex:1;padding:10px 8px;border-radius:10px;border:2px solid var(--border);background:var(--white);cursor:pointer;text-align:center;font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);transition:all .15s;user-select:none;-webkit-user-select:none}
+.cesit-tab:active{opacity:.7}
+.cesit-tab.active{border-color:var(--red);background:#fff0f0;color:var(--red)}
+select{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--white);font-family:'Inter',sans-serif;font-size:.9rem;color:var(--text);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer;margin-bottom:10px;outline:none}
+select:focus{border-color:var(--red)}
+select:disabled{opacity:.5;cursor:not-allowed}
+.isk-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.isk-box{background:var(--bg);border-radius:10px;padding:10px 12px;border:1.5px solid var(--border)}
+.isk-box label{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;font-weight:600}
+.isk-box input{width:100%;border:none;background:transparent;font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);padding:0;outline:none}
+.isk-box.ilave{border-color:#fca5a5;background:#fff0f0}
+.isk-box.ilave label{color:var(--red)}
+.isk-result{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.isk-result span{font-size:.8rem;color:#1d4ed8;font-weight:600}
+.isk-result strong{font-family:'Space Grotesk',sans-serif;font-size:1rem;color:#1d4ed8}
+.adet-row{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.adet-row label{font-size:.78rem;color:var(--muted);font-weight:500;white-space:nowrap}
+.adet-ctrl{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
+.adet-btn{width:38px;height:38px;border:none;background:var(--bg);cursor:pointer;font-size:1.1rem;color:var(--text)}
+.adet-btn:active{background:#fff0f0;color:var(--red)}
+.adet-val{width:42px;text-align:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;border:none;background:var(--white);border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);height:38px;color:var(--text);outline:none}
+.toplam-badge{background:#fff0f0;border:1.5px solid #fca5a5;border-radius:10px;padding:6px 12px;font-family:'Space Grotesk',sans-serif;font-size:.85rem;font-weight:700;color:var(--red)}
+.kur-card{display:none;background:var(--dark);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.kur-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.55);margin-bottom:6px}
+.kur-input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;padding:8px 14px;outline:none}
+.kur-input::placeholder{color:rgba(255,255,255,.35)}
+.result-card{background:var(--dark);border-radius:12px;padding:18px;margin-bottom:12px}
+.rl{font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);margin-bottom:3px;font-weight:600}
+.rp{font-size:.85rem;color:rgba(255,255,255,.8);margin-bottom:14px;line-height:1.4}
+.rp small{opacity:.55}
+.price-big{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;color:#fff;line-height:1}
+.price-cur{font-size:1rem;opacity:.65;margin-right:3px}
+.price-tl{font-size:.95rem;font-weight:700;color:#4ade80;margin-top:4px}
+.price-kdv{font-size:.68rem;color:rgba(255,255,255,.4);margin-top:4px}
+.price-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}
+.pb{background:rgba(255,255,255,.07);border-radius:10px;padding:10px 12px}
+.pb-label{font-size:.62rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px}
+.pb-val{font-family:'Space Grotesk',sans-serif;font-size:.95rem;color:#fff;font-weight:600}
+.pb-val.strike{text-decoration:line-through;opacity:.4;font-size:.85rem}
+.pb-tl{font-size:.68rem;color:#4ade80;margin-top:2px}
+.empty{text-align:center;padding:36px 20px;color:var(--muted)}
+.empty .ei{font-size:2.2rem;margin-bottom:8px}
+.empty p{font-size:.82rem}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--white);border:2px solid var(--border);border-radius:50px;padding:8px 20px;font-weight:700;font-size:.82rem;transition:transform .3s cubic-bezier(.34,1.56,.64,1);z-index:300;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:#16a34a;color:#16a34a}
+.toast.error{border-color:var(--red);color:var(--red)}
+.footer{position:fixed;bottom:10px;right:14px;z-index:50}
+.footer a{color:var(--muted);text-decoration:none;font-size:.68rem;font-weight:600;opacity:.55}
+.teklif-kartlar{display:none}
+.teklif-tablo-wrap{display:block}
+@media(max-width:600px){.teklif-kartlar{display:block}.teklif-tablo-wrap{display:none}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div><h1>Airfel Fiyat Listesi</h1><p>Şubat 2026 • Tavsiye Edilen Perakende Fiyatları</p></div>
+  <div class="header-badge"><span>Geçerlilik</span><strong>06.02.2026</strong></div>
+</div>
+
+<div class="card">
+  <div class="card-title">🔎 Ürün Kodu ile Ara</div>
+  <div style="position:relative">
+    <input type="text" id="kod-input" class="search-input" placeholder="Ürün kodu yazın… (örn: LTXM35, A2CPP024)" autocomplete="off">
+    <div id="kod-results" class="search-results"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">📂 Ürün Kategorisi</div>
+  <div class="tabs" id="cat-tabs">
+    <button class="tab active" data-cat="klima"><span class="tab-icon">❄️</span>Klima</button>
+    <button class="tab" data-cat="kombi"><span class="tab-icon">🔥</span>Kombi</button>
+    <button class="tab" data-cat="merkezi"><span class="tab-icon">🏭</span>Merkezi<br>Sistemler</button>
+  </div>
+  <div class="card-title" style="margin-top:14px">📦 Ürün Çeşidi</div>
+  <div class="cesit-tabs" id="cesit-tabs"></div>
+  <div class="card-title" style="margin-top:14px">🔍 Ürün Seçimi</div>
+  <select id="sel-seri"><option value="">— Seri / Tip Seçin —</option></select>
+  <select id="sel-urun" disabled><option value="">— Ürün Seçin —</option></select>
+</div>
+
+<div class="card">
+  <div class="card-title">🏷️ İskonto Ayarları</div>
+  <div class="isk-row">
+    <div class="isk-box"><label>İskonto 1</label><input type="number" id="isk1" value="15" min="0" max="50" step="0.5"></div>
+    <div class="isk-box"><label>İskonto 2</label><input type="number" id="isk2" value="10" min="0" max="50" step="0.5"></div>
+    <div class="isk-box ilave"><label>+ İlave</label><input type="number" id="isk3" value="0" min="0" max="50" step="0.5" placeholder="0"></div>
+  </div>
+  <div class="isk-result"><span>Toplam İskonto</span><strong id="toplam-isk">% 23,50</strong></div>
+  <div class="adet-row">
+    <label>Adet:</label>
+    <div class="adet-ctrl">
+      <button class="adet-btn" id="btn-azalt">−</button>
+      <input type="number" class="adet-val" id="adet" value="1" min="1">
+      <button class="adet-btn" id="btn-artir">+</button>
+    </div>
+    <div class="toplam-badge" id="toplam-badge" style="display:none">—</div>
+    <button id="btn-teklife-ekle" style="display:none;margin-left:auto;padding:9px 16px;background:#e02020;border:none;border-radius:10px;color:#fff;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap">+ Teklife Ekle</button>
+  </div>
+</div>
+
+<div class="kur-card" id="kur-card">
+  <div class="kur-label" id="kur-label">USD Kuru (₺)</div>
+  <input type="text" inputmode="decimal" id="kur-input" class="kur-input" placeholder="örn: 38,50">
+</div>
+
+<div id="result-area">
+  <div class="card empty"><div class="ei">🔎</div><p>Ürün seçince fiyat burada görünecek</p></div>
+</div>
+
+<div id="teklif-section" style="display:none;margin-top:12px">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin-bottom:0">📋 Teklif Sepeti</div>
+      <button id="btn-sepet-temizle" style="padding:5px 12px;border-radius:7px;border:1px solid #fca5a5;background:transparent;color:#e02020;font-size:.72rem;font-weight:600;cursor:pointer">Sepeti Temizle</button>
+    </div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table id="teklif-tablo" style="width:100%;border-collapse:collapse;font-size:.78rem;min-width:440px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border);color:var(--muted);text-transform:uppercase;font-size:.62rem;letter-spacing:.06em">
+            <th style="text-align:left;padding:8px 6px;font-weight:600">Ürün</th>
+            <th style="text-align:center;padding:8px 6px;font-weight:600">Adet</th>
+            <th style="text-align:right;padding:8px 6px;font-weight:600">Liste</th>
+            <th style="text-align:center;padding:8px 6px;font-weight:600">İsk.%</th>
+            <th style="text-align:right;padding:8px 6px;font-weight:600">Net Birim</th>
+            <th style="text-align:right;padding:8px 6px;font-weight:600">Toplam</th>
+            <th style="padding:8px 6px"></th>
+          </tr>
+        </thead>
+        <tbody id="teklif-tbody"></tbody>
+        <tfoot id="teklif-tfoot"></tfoot>
+      </table>
+    </div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <div class="card-title">Müşteri Bilgileri</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="display:block;font-size:.68rem;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Müşteri / Firma Adı</label>
+          <input type="text" id="teklif-musteri" placeholder="Firma Adı" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-family:'Inter',sans-serif;font-size:.85rem;color:var(--text);outline:none">
+        </div>
+        <div>
+          <label style="display:block;font-size:.68rem;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Geçerlilik Süresi</label>
+          <select id="teklif-gecerlilik" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-family:'Inter',sans-serif;font-size:.85rem;color:var(--text);outline:none;appearance:none;margin-bottom:0">
+            <option value="7">7 Gün</option>
+            <option value="15" selected>15 Gün</option>
+            <option value="30">30 Gün</option>
+          </select>
+        </div>
+      </div>
+      <label style="display:block;font-size:.68rem;color:var(--muted);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Notlar (Opsiyonel)</label>
+      <textarea id="teklif-not" placeholder="Teklife eklemek istediğiniz notlar…" rows="2" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-family:'Inter',sans-serif;font-size:.85rem;color:var(--text);outline:none;resize:vertical"></textarea>
+    </div>
+    <button id="btn-teklif-olustur" style="margin-top:14px;width:100%;padding:13px;background:#e02020;border:none;border-radius:10px;color:#fff;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer">📄 Teklif Oluştur</button>
+  </div>
+</div>
+
+<div id="teklif-cikti-section" style="display:none;margin-top:12px">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin-bottom:0">✅ Teklif Hazır</div>
+      <div style="display:flex;gap:8px">
+        <button id="btn-pdf" style="padding:8px 14px;background:#e02020;border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:600;cursor:pointer">📥 PDF İndir</button>
+        <button id="btn-yeni-teklif" style="padding:8px 14px;border:1px solid var(--border);background:transparent;border-radius:8px;color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer">Yeni Teklif</button>
+      </div>
+    </div>
+    <div id="teklif-cikti"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="footer"><a href="mailto:k.nalvuran@daikin.com.tr">Mustafa Kemal Nalvuran</a></div>
+
+<script>
+const DATA={klima:[{cesit:'urun',seri:"Airfel Vibe – LTXQ Serisi (Ev Tipi)",kapasite:[{label:"9.000/10.000 BTU – LTXQ25A",peshin:36600},{label:"12.000/13.000 BTU – LTXQ35A",peshin:41860},{label:"17.530/17.700 BTU – LTXQ50C",peshin:62710},{label:"24.020/24.560 BTU – LTXQ71C",peshin:73290}]},{cesit:'urun',seri:"LTXM Serisi – Sezonsal İnverter (Ev Tipi)",kapasite:[{label:"9.000/10.000 BTU – LTXM25N",peshin:34190},{label:"12.000/13.000 BTU – LTXM35N",peshin:39110},{label:"18.000/19.000 BTU – LTXM50N",peshin:58590},{label:"24.000/25.000 BTU – LTXM71N",peshin:68480}]},{cesit:'urun',seri:"LTXP Serisi – Sezonsal İnverter (Ev Tipi) YENİ",kapasite:[{label:"8.800/10.000 BTU – LTXP25A",peshin:34190},{label:"11.950/13.000 BTU – LTXP35A",peshin:39110},{label:"17.750/18.430 BTU – LTXP50A",peshin:58590},{label:"23.890/25.010 BTU – LTXP71A",peshin:68480}]},{cesit:'aksesuar',seri:"Wi-Fi Kit",kapasite:[{label:"Wi-Fi Kit (LDS210WF)",peshin:1380}]},{cesit:'urun',seri:"Multi Split – Dış Üniteler",kapasite:[{label:"2LMX50N – 5 kW (18.000 BTU)",peshin:44770},{label:"3LMX80N – 8 kW (27.000 BTU)",peshin:69130},{label:"4LMX105N – 10,5 kW (36.000 BTU)",peshin:88070},{label:"5LMX125N – 12,5 kW (42.000 BTU)",peshin:99680}]},{cesit:'urun',seri:"Multi Split – İç Üniteler LTXM Serisi",kapasite:[{label:"LTXM25N İç Ünite 9.000/10.000 BTU",peshin:11470},{label:"LTXM35N İç Ünite 12.000/13.000 BTU",peshin:13370},{label:"LTXM50N İç Ünite 18.000/19.000 BTU",peshin:17630},{label:"LTXM71N İç Ünite 24.000/25.000 BTU",peshin:20500}]},{cesit:'urun',seri:"Multi Split – İç Üniteler LTXP Serisi YENİ",kapasite:[{label:"LTXP25A İç Ünite 8.800/10.000 BTU",peshin:11470},{label:"LTXP35A İç Ünite 11.950/13.000 BTU",peshin:13370},{label:"LTXP50A İç Ünite 17.750/18.430 BTU",peshin:17630},{label:"LTXP71A İç Ünite 23.890/25.010 BTU",peshin:20500}]},{cesit:'urun',seri:"Multi Split – Tek Yöne Üfleme İç Üniteler YENİ",kapasite:[{label:"LKXA25 – 8.800/10.000 BTU",peshin:28760},{label:"LKXA35 – 11.950/13.000 BTU",peshin:29910},{label:"LKXA50 – 17.750/18.430 BTU",peshin:32660},{label:"LKXA71 – 23.890/25.010 BTU",peshin:38240}]},{cesit:'urun',seri:"Inverter Salon Tipi Split Klima YENİ",kapasite:[{label:"LVA71 – 24.000/26.000 BTU",peshin:91740},{label:"LVA125 – 41.000/45.000 BTU",peshin:114790},{label:"LVA140 – 48.000/55.000 BTU",peshin:135890}]},{cesit:'urun',seri:"Inverter Kaset Tipi Split Klima YENİ",kapasite:[{label:"LCA71 – 24.000/26.000 BTU",peshin:87190},{label:"LCA140 – 48.000/55.000 BTU",peshin:135370}]},{cesit:'urun',seri:"Inverter Gizli Tavan Tipi Split Klima YENİ",kapasite:[{label:"LBA160 – 52.000/62.000 BTU",peshin:139920}]},{cesit:'urun',seri:"Mobil Klima",kapasite:[{label:"LPCY35BM – 12.000/10.000 BTU",peshin:26850}]},{cesit:'urun',seri:"Hava Serinletici",kapasite:[{label:"LACL10AB – 10 Litre Su Tankı",peshin:7470}]}],kombi:[{cesit:'urun',seri:"Maestro Smart Kombi",kapasite:[{label:"Maestro Smart 24 kW – TR.A2CPP024BATR.01",peshin:45090},{label:"Maestro Smart 28 kW – TR.A2CPP028BATR.01",peshin:49010},{label:"Maestro Demo 24 kW",peshin:8760}]},{cesit:'urun',seri:"Maestro Comfort Kombi",kapasite:[{label:"Maestro Comfort 24 kW – TR.A2CPP024EBTR.02",peshin:40380},{label:"Maestro Comfort 28 kW – TR.A2CPP028EBTR.02",peshin:44300}]},{cesit:'urun',seri:"Maestro Power Kombi",kapasite:[{label:"Maestro Power 23 kW – TR.A2CPN023BATR.01",peshin:39440},{label:"Maestro Power 26 kW – TR.A2CPN026BATR.01",peshin:41200},{label:"Maestro Power 30 kW – TR.A2CPN030BATR.01",peshin:44340},{label:"Maestro Power 36 kW – TR.A2CPN036BATR.01",peshin:48410},{label:"Maestro Power Demo 23 kW",peshin:8130}]},{cesit:'urun',seri:"Maestro Optimum Premix Kombi",kapasite:[{label:"Maestro Optimum 20 kW – TR.A2CPX020EATR.01",peshin:35780},{label:"Maestro Optimum 23 kW – TR.A2CPX023EATR.01",peshin:38290},{label:"Maestro Optimum 26 kW – TR.A2CPX026EATR.01",peshin:39980},{label:"Maestro Optimum 30 kW – TR.A2CPX030EATR.01",peshin:43070},{label:"Maestro Optimum 36 kW – TR.A2CPX036EATR.01",peshin:47010},{label:"Maestro Optimum 42 kW – TR.A2CPX042EATR.01",peshin:51710},{label:"Maestro Optimum Demo 20 kW",peshin:5420}]},{cesit:'aksesuar',seri:"Oda Termostatları",kapasite:[{label:"Airfel Scala Pro Smart – ABRTMRFNAATR",peshin:5100},{label:"Airfel Scala Kablosuz – ABRTORFNAATR",peshin:4900},{label:"Airfel Scala Digitherm – ABRTECORFFAA",peshin:2150}]},{cesit:'aksesuar',seri:"Kombi Aksesuarları – Baca Beyaz (Yoğuşmalı)",kapasite:[{label:"Yatay Baca Seti Flanşlı – AYKFLBASETYTAA",peshin:900},{label:"Dirsek 90° – AYKDI90AA",peshin:650},{label:"Dirsek 45° – AYKDI45AA",peshin:790},{label:"Dik Baca Seti Adaptör Dahil – AYKBASETDIAA",peshin:1900},{label:"Dik Baca Adaptörü – AYKBAADPAA",peshin:1250},{label:"Ø60/100 den Ø80/Ø80 Adaptör – AYKBADP8080AA",peshin:1950},{label:"Yoğuşmalı Kombi Baca Çıkışı Uzatma – AYKBAUZD250AA",peshin:1500},{label:"Baca Uzatma 100cm – AYKBAUZ100AA",peshin:725},{label:"Baca Uzatma 200cm – AYKBAUZ200AA",peshin:2000},{label:"Baca Uzatma 50cm – AYKBAUZ50AA",peshin:520}]},{cesit:'aksesuar',seri:"Kombi Aksesuarları – Baca Siyah (Yoğuşmalı)",kapasite:[{label:"Yatay Baca Seti Flanşlı Siyah – AYKFLBASETYTAB",peshin:1050},{label:"Dirsek 90° Siyah – AYKDI90AB",peshin:880},{label:"Dirsek 45° Siyah – AYKDI45AB",peshin:1000},{label:"Dik Baca Seti Adaptör Dahil Siyah – AYKBASETDIAB",peshin:2900},{label:"Yoğuşmalı Kombi Baca Çıkışı Uzatma Siyah – AYKBAADPAB",peshin:1250},{label:"Baca Uzatma 100cm Siyah – AYKBAUZ100AB",peshin:920},{label:"Baca Uzatma 200cm Siyah – AYKBAUZ200AB",peshin:1800},{label:"Baca Uzatma 50cm Siyah – AYKBAUZ50AB",peshin:790}]},{cesit:'aksesuar',seri:"Kombi Aksesuarları – Ø80/125 Baca Parçaları",kapasite:[{label:"Ø60/100-Ø80/125 Adaptör – AYKBAADP812AA",peshin:1160},{label:"Ø80/125 Dirsek 90° – AYKBADI908AA",peshin:1850},{label:"Ø80/125 Dirsek 45° – AYKBADI458AA",peshin:1680},{label:"Ø80/125 Baca Uzatma 100cm – AYKBAUZ1008AA",peshin:2100},{label:"Ø80/125 Baca Uzatma 50cm – AYKBAUZ508AA",peshin:1480},{label:"Ø80/125 Dik Baca Seti Adaptör Hariç – AYKBASETDI8AA",peshin:3570},{label:"Ø80/125 Düz Çatı Sabitleme – AYKBASDC8AA",peshin:800},{label:"Ø80/125 Eğimli Çatı Sabitleme – AYKBASEC8AA",peshin:1300},{label:"Ø80/125 Yatay Baca Terminali – AYKBAYT8AA",peshin:2000},{label:"Düz Çatı Sabitleme Parçası – AYKBASDCAA",peshin:800},{label:"Eğimli Çatı Sabitleme Parçası – AYKBASECAA",peshin:1350}]}],merkezi:[{cesit:'urun',seri:"HeatPro Duvar Tipi Kazan (EUR)",kapasite:[{label:"60 kW Master – A2HWS060MAA",peshin:1439,doviz:"EUR"},{label:"60 kW Slave – A2HWS060SLA",peshin:1373,doviz:"EUR"},{label:"100 kW Master – A2HWS100MAA",peshin:2087,doviz:"EUR"},{label:"100 kW Slave – A2HWS100SLA",peshin:1997,doviz:"EUR"},{label:"130 kW Master – A2HWS120MAA",peshin:2338,doviz:"EUR"},{label:"130 kW Slave – A2HWS120SLA",peshin:2238,doviz:"EUR"},{label:"150 kW Master – A2HWS150MAA",peshin:2746,doviz:"EUR"},{label:"150 kW Slave – A2HWS150SLA",peshin:2621,doviz:"EUR"}]},{cesit:'urun',seri:"Airpro Isı Pompası (USD)",kapasite:[{label:"AMBHP08AAV1 – 7,7 kW Monofaze Isıtıcılı",peshin:2953,doviz:"USD"},{label:"AMBHP10AAV1 – 9,6 kW Monofaze Isıtıcılı",peshin:3146,doviz:"USD"},{label:"AMBHP12AAV1 – 12,3 kW Monofaze Isıtıcılı",peshin:3980,doviz:"USD"},{label:"AMBHP16AAV1 – 15,8 kW Monofaze Isıtıcılı",peshin:4365,doviz:"USD"},{label:"AMBHP16AAW1 – 15,8 kW Trifaze Isıtıcılı",peshin:4487,doviz:"USD"}]},{cesit:'aksesuar',seri:"Isı Pompası Aksesuarları (EUR)",kapasite:[{label:"Honeywell 3 Yollu Vana Motoru – AHPVC6013ZZ00E",peshin:45,doviz:"EUR"},{label:"Honeywell 3 Yollu Vana – AHPVCZMP6000E",peshin:46,doviz:"EUR"},{label:"Honeywell Otomatik Bypass Vanası – AHPDU14534E",peshin:90,doviz:"EUR"}]},{cesit:'aksesuar',seri:"HeatPro Kazan Pompaları (EUR)",kapasite:[{label:"UPML25-95 Pompa 60kW – AAMPFKGUPML2595",peshin:203,doviz:"EUR"},{label:"UPMXL 25-125 130 AUTO DKI 100-130kW – AALPFKGUPMXL25105",peshin:237,doviz:"EUR"},{label:"UPMXXL 32-120 Pompa 150kW – AALPFKGUPMXXL3212",peshin:376,doviz:"EUR"},{label:"Willo Pompa Para Maxo 30-18 150kW – TR.APWLPARMAX30P",peshin:350,doviz:"EUR"},{label:"Grundfos UPML Molex Kablo – AAMPGUPMLMOLEX",peshin:10,doviz:"EUR"},{label:"Pompa ve Montaj Kiti UPML25-105 60kW – TR.AAMPKFKGAA.01",peshin:360,doviz:"EUR"},{label:"Pompa ve Montaj Kiti UPMXL25-125 100-130kW – TR.AALPFKGUPMXL251",peshin:482,doviz:"EUR"},{label:"Grundfoss Pompa ve Montaj Kiti UPMXXL 32-120 150kW – TR.AALGPMXXL32.01",peshin:621,doviz:"EUR"},{label:"Willo Pompa ve Montaj Kiti 150kW – TR.APWLPARMAXO3018",peshin:594,doviz:"EUR"}]},{cesit:'aksesuar',seri:"HeatPro Kazan Kontrol Aksesuarları (EUR)",kapasite:[{label:"Kaskad Modülü Tüm Modeller – ADWHBKMOCI345",peshin:66,doviz:"EUR"},{label:"SIEMENS QAA55 Modulasyonlu Oda Termostatı – APXQAA55",peshin:86,doviz:"EUR"},{label:"AVS75.390/101 İlave Modül Kablolu – TR.APXAVS75390101",peshin:280,doviz:"EUR"},{label:"QAC34/101 Dış Hava Sensörü – AYKQAC34101",peshin:15,doviz:"EUR"},{label:"QAZ36 522/109 Daldırma Tip Sensör – APXQAZ36522109",peshin:11,doviz:"EUR"},{label:"QAD36 Yüzey Tip Sensör – APXQAD36101",peshin:27,doviz:"EUR"},{label:"Modbus Kartı – OCI35101",peshin:92,doviz:"EUR"},{label:"Web Server – OCI670",peshin:386,doviz:"EUR"}]},{cesit:'aksesuar',seri:"HeatPro Baca Aksesuarları D.80 – 60-69kW (EUR)",kapasite:[{label:"B23 Baca Uzatma D.80 L.0,5m – DAYTCBAUZ50D80AA",peshin:7,doviz:"EUR"},{label:"B23 Baca Uzatma D.80 L.1m – DAYTCBAUZ100D80AA",peshin:9,doviz:"EUR"},{label:"B23 Baca 90° Dirsek D.80 – DAYTCBADI90D80AA",peshin:11,doviz:"EUR"},{label:"B23 Baca Kuşluklu Terminal D.80 – DAYTCBATERD80AA",peshin:14,doviz:"EUR"},{label:"Ø80/125 Konsantrik Yatay Baca Terminali – AAMBAYT8AA",peshin:47,doviz:"EUR"},{label:"Ø80/125 Konsantrik 87° Dirsek – AAMBADI878AA",peshin:38,doviz:"EUR"},{label:"Ø80/125 Konsantrik 45° Dirsek – AAMBADI458AA",peshin:41,doviz:"EUR"},{label:"Ø80/125 Konsantrik Baca Uzatma L=1000mm – AAMBAUZ1008AA",peshin:49,doviz:"EUR"},{label:"Ø80/125 Konsantrik Baca Uzatma L=500mm – AAMBAUZ508AA",peshin:36,doviz:"EUR"},{label:"Ø80/125 Konsantrik Çatı Üstü Dik Baca Kiti – AAMBAKCUD8AA",peshin:86,doviz:"EUR"},{label:"Ø80/125 Konsantrik Düz Çatı Sabitleme – AAMBASDC10AA",peshin:19,doviz:"EUR"},{label:"Ø80/125 Konsantrik Eğimli Çatı Sabitleme – AAMBASEC8AA",peshin:33,doviz:"EUR"},{label:"Ø80/125 Konsantrik Baca Seti – AAMYBASETYD80125",peshin:81,doviz:"EUR"},{label:"Ø80/125 Konsantrik İkiz Baca Adaptörü 80-80 – AAMBAKT8012D8080AA",peshin:59,doviz:"EUR"},{label:"69 kW Konsantrik Baca Kiti – AAMD2HALBAKKAA",peshin:163,doviz:"EUR"},{label:"Klape Çap 80 69kW – AAMBAKLAP80AA",peshin:51,doviz:"EUR"}]},{cesit:'aksesuar',seri:"HeatPro Baca Aksesuarları D.100 – 100-150kW (EUR)",kapasite:[{label:"B23 Baca Uzatma D.100 L.0,5m – DAYTCBAUZ50D100AA",peshin:9,doviz:"EUR"},{label:"B23 Baca Uzatma D.100 L.1m – DAYTCBAUZ100D100AA",peshin:11,doviz:"EUR"},{label:"B23 Baca 90° Dirsek D.100 – DAYTCBADI90D100AA",peshin:11,doviz:"EUR"},{label:"B23 Baca Kuşluklu Terminal D.100 – DAYTCBATERD100AA",peshin:15,doviz:"EUR"},{label:"Ø100/150 Konsantrik 45° Dirsek – AAMBADI4510AA",peshin:53,doviz:"EUR"},{label:"Ø100/150 Konsantrik 87° Dirsek – AAMBADI8710AA",peshin:49,doviz:"EUR"},{label:"Ø100/150 Konsantrik Çatı Üstü Dik Baca Kiti – AAMBAKCUD10AA",peshin:163,doviz:"EUR"},{label:"Ø100/150 Konsantrik Düz Çatı Sabitleme – AAMBASDC8AA",peshin:73,doviz:"EUR"},{label:"Ø100/150 Konsantrik Eğimli Çatı Sabitleme – AAMBASEC10AA",peshin:73,doviz:"EUR"},{label:"Ø100/150 Konsantrik Baca Uzatma L=1000mm – AAMBAUZ10010AA",peshin:54,doviz:"EUR"},{label:"Ø100/150 Konsantrik Baca Uzatma L=500mm – AAMBAUZ5010AA",peshin:41,doviz:"EUR"},{label:"Ø100/150 Konsantrik Yatay Baca Terminali – AAMBAYT10AA",peshin:97,doviz:"EUR"},{label:"Ø100/150 Konsantrik Baca Seti – AAMYBASETYD10150",peshin:102,doviz:"EUR"},{label:"Ø100/150 Konsantrik İkiz Baca Adaptörü 80-80 – AAMBAKT1015D1010AA",peshin:99,doviz:"EUR"},{label:"Klape Çap 100 100-115kW – AAMBAKLAPAA",peshin:56,doviz:"EUR"},{label:"Klape Çap 110 125kW – TR.AAMBAKLAP110AA",peshin:112,doviz:"EUR"},{label:"Klape Çap 125 155kW – AAMBAKLAP125AA",peshin:102,doviz:"EUR"}]},{cesit:'aksesuar',seri:"HeatPro Baca Aksesuarları D.110-160 (EUR)",kapasite:[{label:"B23 Baca Uzatma D.110 L.0,5m 125kW – DAYTCBAUZ50D110AA",peshin:17,doviz:"EUR"},{label:"B23 Baca Uzatma D.110 L.1m 125kW – DAYTCBAUZ100D110AA",peshin:20,doviz:"EUR"},{label:"B23 Baca 90° Dirsek D.110 125kW – DAYTCBADI90D110AA",peshin:24,doviz:"EUR"},{label:"B23 Baca Kuşluklu Terminal D.110 125kW – DAYTCBATERD110AA",peshin:22,doviz:"EUR"},{label:"B23 Baca Uzatma D.125 L.0,5m 155kW – DAYTCBAUZ50D125AA",peshin:18,doviz:"EUR"},{label:"B23 Baca Uzatma D.125 L.1m 155kW – DAYTCBAUZ100D125AA",peshin:24,doviz:"EUR"},{label:"B23 Baca 90° Dirsek D.125 155kW – DAYTCBADI90D125AA",peshin:25,doviz:"EUR"},{label:"B23 Baca Kuşluklu Terminal D.125 155kW – DAYTCBATERD125AA",peshin:22,doviz:"EUR"},{label:"B23 Baca Uzatma D.160 L.0,5m 190kW – DAYTCBAUZ50D160AA",peshin:31,doviz:"EUR"},{label:"B23 Baca Uzatma D.160 L.1m 190kW – DAYTCBAUZ100D160AA",peshin:47,doviz:"EUR"},{label:"B23 Baca 90° Dirsek D.160 190kW – DAYTCBADI90D160AA",peshin:40,doviz:"EUR"},{label:"B23 Baca Kuşluklu Terminal D.160 190kW – DAYTCBATERD160AA",peshin:36,doviz:"EUR"}]}]};
+
+let cat='klima',cesit='urun',seriIdx=-1;
+let selPeshin=null,selLabel='',selSeri='',selDoviz=null,kurVal='';
+let teklifSepet=[],teklifNo=parseInt(localStorage.getItem('airfel_teklif_no')||'1000');
+const CESIT={klima:{urun:'❄️ Klima',aksesuar:'🔧 Klima Aksesuarları'},kombi:{urun:'🔥 Kombi',aksesuar:'🔧 Kombi Aksesuarları'},merkezi:{urun:'🏭 Merkezi Sistemler',aksesuar:'🔧 Merkezi Sistem Aksesuarları'}};
+
+function fmt(n){return n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtT(n,d){return fmt(n)+' '+(d||'₺');}
+function getCarpan(){const i1=parseFloat(document.getElementById('isk1').value)||0,i2=parseFloat(document.getElementById('isk2').value)||0,i3=parseFloat(document.getElementById('isk3').value)||0;return(1-i1/100)*(1-i2/100)*(1-i3/100);}
+function getKur(){return parseFloat((kurVal||'0').replace(',','.'))||0;}
+function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'')+' show';setTimeout(()=>t.classList.remove('show'),2500);}
+
+function renderCesitTabs(){const c=document.getElementById('cesit-tabs');c.innerHTML='';Object.entries(CESIT[cat]).forEach(([key,label])=>{const btn=document.createElement('button');btn.className='cesit-tab'+(key===cesit?' active':'');btn.textContent=label;btn.addEventListener('click',()=>setCesit(key));c.appendChild(btn);});}
+function renderSeri(){const sel=document.getElementById('sel-seri');sel.innerHTML='<option value="">— Seri / Tip Seçin —</option>';DATA[cat].forEach((item,i)=>{if(item.cesit!==cesit)return;const o=document.createElement('option');o.value=i;o.textContent=item.seri;sel.appendChild(o);});sel.value='';renderUrun();}
+function renderUrun(){const sel=document.getElementById('sel-urun');sel.innerHTML='<option value="">— Ürün Seçin —</option>';sel.disabled=true;selPeshin=null;selLabel='';selSeri='';selDoviz=null;if(seriIdx>=0&&DATA[cat][seriIdx]){DATA[cat][seriIdx].kapasite.forEach((k,i)=>{const o=document.createElement('option');o.value=i;o.textContent=k.label;sel.appendChild(o);});sel.disabled=false;}}
+function setCat(nc){cat=nc;cesit='urun';seriIdx=-1;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));renderCesitTabs();renderSeri();showEmpty();}
+function setCesit(nc){cesit=nc;seriIdx=-1;renderCesitTabs();renderSeri();showEmpty();}
+
+function hesapla(){
+  const carpan=getCarpan(),isk=(1-carpan)*100;
+  document.getElementById('toplam-isk').textContent='% '+isk.toFixed(2).replace('.',',');
+  if(!selPeshin){showEmpty();return;}
+  document.getElementById('btn-teklife-ekle').style.display='block';
+  const adet=parseInt(document.getElementById('adet').value)||1,net=selPeshin*carpan,toplam=net*adet,kur=getKur();
+  const tlNet=(selDoviz&&kur>0)?net*kur:null,tlToplam=(selDoviz&&kur>0)?toplam*kur:null,tlListe=(selDoviz&&kur>0)?selPeshin*kur:null,dovStr=selDoviz||'₺';
+  const kc=document.getElementById('kur-card');
+  if(selDoviz){kc.style.display='block';document.getElementById('kur-label').textContent=selDoviz+' Kuru (₺)';}else kc.style.display='none';
+  const tb=document.getElementById('toplam-badge');
+  if(adet>1){tb.style.display='';tb.textContent=fmt(toplam)+' '+dovStr+(tlToplam?' = '+fmt(tlToplam)+' ₺':'');}else tb.style.display='none';
+  document.getElementById('result-area').innerHTML=`<div class="result-card"><div class="rl">Seçilen Ürün</div><div class="rp">${selSeri}<br><small>${selLabel}</small></div><div class="rl">Net Satış Fiyatı (1 Adet)</div><div class="price-big"><span class="price-cur">${dovStr}</span>${fmt(net)}</div>${tlNet?`<div class="price-tl">= ${fmt(tlNet)} ₺</div>`:''}<div class="price-kdv">KDV dahil${selDoviz?' ('+selDoviz+' cinsinden)':''}</div><div class="price-row"><div class="pb"><div class="pb-label">Liste (Peşin)</div><div class="pb-val strike">${fmt(selPeshin)} ${dovStr}</div>${tlListe?`<div class="pb-tl">${fmt(tlListe)} ₺</div>`:''}</div><div class="pb"><div class="pb-label">${adet>1?adet+' Adet Toplam':'Net Fiyat'}</div><div class="pb-val">${fmt(adet>1?toplam:net)} ${dovStr}</div>${(adet>1&&tlToplam)?`<div class="pb-tl">${fmt(tlToplam)} ₺</div>`:''} ${(adet===1&&tlNet)?`<div class="pb-tl">${fmt(tlNet)} ₺</div>`:''}</div>${adet>1?`<div class="pb" style="grid-column:1/-1"><div class="pb-label">Toplam Tasarruf</div><div class="pb-val" style="color:#4ade80">${fmt((selPeshin-net)*adet)} ${dovStr}</div></div>`:''}</div></div>`;
+}
+function showEmpty(){document.getElementById('kur-card').style.display='none';document.getElementById('toplam-badge').style.display='none';document.getElementById('btn-teklife-ekle').style.display='none';document.getElementById('result-area').innerHTML=`<div class="card empty"><div class="ei">🔎</div><p>Ürün seçince fiyat burada görünecek</p></div>`;}
+
+const SIDX=[];Object.entries(DATA).forEach(([c,arr])=>arr.forEach(s=>s.kapasite.forEach(k=>SIDX.push({cat:c,cesit:s.cesit,seri:s.seri,label:k.label,peshin:k.peshin,doviz:k.doviz}))));
+const CN={klima:'❄️ Klima',kombi:'🔥 Kombi',merkezi:'🏭 Merkezi Sistemler'};
+let st;
+document.getElementById('kod-input').addEventListener('input',function(){clearTimeout(st);st=setTimeout(()=>doSearch(this.value),150);});
+function doSearch(q){const box=document.getElementById('kod-results'),term=q.trim().toUpperCase();if(term.length<2){box.style.display='none';return;}const matches=SIDX.filter(m=>m.label.toUpperCase().includes(term)||m.seri.toUpperCase().includes(term)).slice(0,12);if(!matches.length){box.innerHTML='<div class="no-result">Eşleşen ürün bulunamadı</div>';box.style.display='block';return;}box.innerHTML=matches.map((m,i)=>{const hl=m.label.replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'),'<mark>$1</mark>');return`<div class="search-item" data-idx="${i}"><div class="si-label">${hl}</div><div class="si-sub">${CN[m.cat]} · ${m.seri}</div><div class="si-price">${m.peshin.toLocaleString('tr-TR')} ${m.doviz||'₺'} (liste)</div></div>`;}).join('');box.style.display='block';window._sm=matches;}
+document.getElementById('kod-results').addEventListener('click',function(e){const item=e.target.closest('.search-item');if(!item)return;const m=window._sm[parseInt(item.dataset.idx)];if(!m)return;cat=m.cat;cesit=m.cesit;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));renderCesitTabs();seriIdx=DATA[cat].findIndex(s=>s.seri===m.seri);renderSeri();document.getElementById('sel-seri').value=seriIdx;renderUrun();const uIdx=DATA[cat][seriIdx].kapasite.findIndex(k=>k.label===m.label);document.getElementById('sel-urun').value=uIdx;selPeshin=m.peshin;selLabel=m.label;selSeri=m.seri;selDoviz=m.doviz||null;hesapla();document.getElementById('kod-input').value=m.label;document.getElementById('kod-results').style.display='none';});
+document.addEventListener('click',function(e){if(!e.target.closest('#kod-input')&&!e.target.closest('#kod-results'))document.getElementById('kod-results').style.display='none';});
+
+document.getElementById('cat-tabs').addEventListener('click',function(e){const btn=e.target.closest('.tab');if(btn&&btn.dataset.cat)setCat(btn.dataset.cat);});
+document.getElementById('sel-seri').addEventListener('change',function(){seriIdx=this.value!==''?parseInt(this.value):-1;renderUrun();showEmpty();});
+document.getElementById('sel-urun').addEventListener('change',function(){if(seriIdx<0||this.value===''){selPeshin=null;showEmpty();return;}const k=DATA[cat][seriIdx].kapasite[parseInt(this.value)];selPeshin=k.peshin;selLabel=k.label;selSeri=DATA[cat][seriIdx].seri;selDoviz=k.doviz||null;hesapla();});
+['isk1','isk2','isk3'].forEach(id=>document.getElementById(id).addEventListener('input',hesapla));
+document.getElementById('btn-azalt').addEventListener('click',function(){const inp=document.getElementById('adet');inp.value=Math.max(1,(parseInt(inp.value)||1)-1);hesapla();});
+document.getElementById('btn-artir').addEventListener('click',function(){const inp=document.getElementById('adet');inp.value=(parseInt(inp.value)||1)+1;hesapla();});
+document.getElementById('adet').addEventListener('input',hesapla);
+document.getElementById('kur-input').addEventListener('input',function(){kurVal=this.value;hesapla();});
+
+function teklifeEkle(){if(!selPeshin){toast('Önce ürün seçin','error');return;}const adet=parseInt(document.getElementById('adet').value)||1,carpan=getCarpan(),isk=(1-carpan)*100,netBirim=selPeshin*carpan;teklifSepet.push({id:Date.now(),label:selLabel,seri:selSeri,adet,peshin:selPeshin,isk,netBirim,netToplam:netBirim*adet,doviz:selDoviz||null});renderTeklifSepet();document.getElementById('teklif-section').style.display='block';document.getElementById('teklif-section').scrollIntoView({behavior:'smooth',block:'start'});toast(adet+' adet ürün teklife eklendi ✓','success');}
+
+function renderTeklifSepet(){
+  const tbody=document.getElementById('teklif-tbody'),tfoot=document.getElementById('teklif-tfoot');
+  if(!teklifSepet.length){document.getElementById('teklif-section').style.display='none';return;}
+  const toplamTL=teklifSepet.filter(r=>!r.doviz).reduce((s,r)=>s+r.netToplam,0),dovizT={};
+  teklifSepet.filter(r=>r.doviz).forEach(r=>{if(!dovizT[r.doviz])dovizT[r.doviz]=0;dovizT[r.doviz]+=r.netToplam;});
+  tbody.innerHTML=teklifSepet.map(r=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:9px 6px;line-height:1.35"><div style="font-weight:600;font-size:.8rem">${r.label}</div><div style="font-size:.68rem;color:var(--muted)">${r.seri}</div></td><td style="padding:9px 6px;text-align:center">${r.adet}</td><td style="padding:9px 6px;text-align:right;color:var(--muted)">${fmtT(r.peshin,r.doviz)}</td><td style="padding:9px 6px;text-align:center;color:#f59e0b">%${r.isk.toFixed(1)}</td><td style="padding:9px 6px;text-align:right;font-weight:600">${fmtT(r.netBirim,r.doviz)}</td><td style="padding:9px 6px;text-align:right;font-weight:700;color:#e02020">${fmtT(r.netToplam,r.doviz)}</td><td style="padding:9px 6px;text-align:center"><button onclick="teklifSil(${r.id})" style="width:24px;height:24px;border-radius:5px;border:1px solid #fca5a5;background:transparent;color:#ef4444;cursor:pointer;font-size:.8rem">✕</button></td></tr>`).join('');
+  const tlS=teklifSepet.some(r=>!r.doviz)?`<tr style="border-top:1px solid var(--border)"><td colspan="2" style="padding:7px 6px;font-size:.72rem;color:var(--muted);text-transform:uppercase">₺ Toplam</td><td colspan="3"></td><td style="padding:7px 6px;text-align:right;font-weight:700;color:#e02020">${toplamTL.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})} ₺</td><td></td></tr>`:'';
+  const dvS=Object.entries(dovizT).map(([d,t])=>`<tr style="border-top:1px solid var(--border)"><td colspan="2" style="padding:7px 6px;font-size:.72rem;color:var(--muted);text-transform:uppercase">${d} Toplam</td><td colspan="3"></td><td style="padding:7px 6px;text-align:right;font-weight:700;color:#e02020">${t.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})} ${d}</td><td></td></tr>`).join('');
+  tfoot.innerHTML=`<tr style="border-top:2px solid var(--border)"><td colspan="7"></td></tr>${tlS}${dvS}`;
+}
+
+function teklifSil(id){teklifSepet=teklifSepet.filter(r=>r.id!==id);renderTeklifSepet();if(!teklifSepet.length)document.getElementById('teklif-cikti-section').style.display='none';}
+
+function teklifOlustur(){
+  if(!teklifSepet.length){toast('Sepet boş','error');return;}
+  const musteri=document.getElementById('teklif-musteri').value.trim()||'Müşteri';
+  const gecerlilik=document.getElementById('teklif-gecerlilik').value;
+  const not=document.getElementById('teklif-not').value.trim();
+  teklifNo++;localStorage.setItem('airfel_teklif_no',teklifNo);
+  const bugun=new Date().toLocaleDateString('tr-TR'),gecerliTarih=new Date(Date.now()+parseInt(gecerlilik)*86400000).toLocaleDateString('tr-TR');
+  const toplamTL2=teklifSepet.filter(r=>!r.doviz).reduce((s,r)=>s+r.netToplam,0),dovizT2={};
+  teklifSepet.filter(r=>r.doviz).forEach(r=>{if(!dovizT2[r.doviz])dovizT2[r.doviz]=0;dovizT2[r.doviz]+=r.netToplam;});
+  const toplamStr=[...(teklifSepet.some(r=>!r.doviz)?[`${toplamTL2.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})} ₺`]:[]),...Object.entries(dovizT2).map(([d,t])=>`${t.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})} ${d}`)].join(' + ');
+  const satirlar=teklifSepet.map(r=>`<tr style="border-bottom:1px solid #e5e7eb"><td style="padding:8px 10px;font-size:.8rem;color:#1a1d2e;line-height:1.35"><div style="font-weight:600">${r.label}</div><div style="font-size:.68rem;color:#6b7280">${r.seri}</div></td><td style="padding:8px 10px;text-align:center;font-size:.8rem">${r.adet}</td><td style="padding:8px 10px;text-align:right;font-size:.8rem;color:#6b7280;text-decoration:line-through">${fmtT(r.peshin,r.doviz)}</td><td style="padding:8px 10px;text-align:center;font-size:.8rem;color:#f59e0b">%${r.isk.toFixed(1)}</td><td style="padding:8px 10px;text-align:right;font-size:.8rem;font-weight:600">${fmtT(r.netBirim,r.doviz)}</td><td style="padding:8px 10px;text-align:right;font-size:.8rem;font-weight:700;color:#e02020">${fmtT(r.netToplam,r.doviz)}</td></tr>`).join('');
+  const kartlar=teklifSepet.map(r=>`<div style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:10px"><div style="font-weight:700;font-size:.85rem;color:#1a1d2e;margin-bottom:2px">${r.label}</div><div style="font-size:.7rem;color:#6b7280;margin-bottom:10px">${r.seri}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="background:#f9fafb;border-radius:6px;padding:7px 10px"><div style="font-size:.6rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;font-weight:600">Adet</div><div style="font-size:.88rem;font-weight:600;color:#1a1d2e;margin-top:1px">${r.adet}</div></div><div style="background:#f9fafb;border-radius:6px;padding:7px 10px"><div style="font-size:.6rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;font-weight:600">İskonto</div><div style="font-size:.88rem;font-weight:600;color:#f59e0b;margin-top:1px">%${r.isk.toFixed(1)}</div></div></div><div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center"><div style="font-size:.7rem;color:#6b7280">Liste: <span style="text-decoration:line-through">${fmtT(r.peshin,r.doviz)}</span></div><div style="font-size:.95rem;font-weight:700;color:#e02020">${fmtT(r.netToplam,r.doviz)}</div></div></div>`).join('');
+  const html=`<div id="teklif-yazdir" style="background:#fff;border-radius:12px;overflow:hidden;font-family:'Inter',sans-serif">
+    <div style="background:linear-gradient(135deg,#c81a1a,#e02020);padding:20px 24px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+      <div><div style="font-size:1.3rem;font-weight:700;color:#fff;font-family:'Space Grotesk',sans-serif">Fiyat Teklifi</div><div style="font-size:.72rem;color:rgba(255,255,255,.7);margin-top:2px">Tavsiye Edilen Perakende Fiyatları</div></div>
+      <div style="text-align:right"><div style="font-size:.72rem;color:rgba(255,255,255,.7)">Teklif No</div><div style="font-size:1rem;font-weight:700;color:#fff">#${teklifNo}</div></div>
+    </div>
+    <div style="padding:16px 24px;background:#f9fafb;border-bottom:1px solid #e5e7eb;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div><div style="font-size:.62rem;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;font-weight:600">Müşteri</div><div style="font-size:.88rem;font-weight:600;color:#1a1d2e;margin-top:2px">${musteri}</div></div>
+      <div><div style="font-size:.62rem;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;font-weight:600">Tarih</div><div style="font-size:.88rem;color:#1a1d2e;margin-top:2px">${bugun}</div></div>
+      <div><div style="font-size:.62rem;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;font-weight:600">Geçerlilik</div><div style="font-size:.88rem;color:#1a1d2e;margin-top:2px">${gecerliTarih}</div></div>
+    </div>
+    <div style="padding:16px 24px">
+      <div class="teklif-kartlar">${kartlar}<div style="background:#fff5f5;border:2px solid #fca5a5;border-radius:10px;padding:12px">${teklifSepet.some(r=>!r.doviz)?`<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:.62rem;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;font-weight:600">₺ Toplam</div><div style="font-size:1.1rem;font-weight:700;color:#e02020">${toplamTL2.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})} ₺</div></div>`:''}${Object.entries(dovizT2).map(([d,t])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px solid #fca5a5"><div style="font-size:.62rem;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;font-weight:600">${d} Toplam</div><div style="font-size:1rem;font-weight:700;color:#e02020">${t.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})} ${d}</div></div>`).join('')}</div></div>
+      <div class="teklif-tablo-wrap"><table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f3f4f6"><th style="padding:8px 10px;text-align:left;font-size:.65rem;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;font-weight:600">Ürün</th><th style="padding:8px 10px;text-align:center;font-size:.65rem;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;font-weight:600">Adet</th><th style="padding:8px 10px;text-align:right;font-size:.65rem;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;font-weight:600">Liste</th><th style="padding:8px 10px;text-align:center;font-size:.65rem;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;font-weight:600">İskonto</th><th style="padding:8px 10px;text-align:right;font-size:.65rem;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;font-weight:600">Net Birim</th><th style="padding:8px 10px;text-align:right;font-size:.65rem;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;font-weight:600">Toplam</th></tr></thead><tbody>${satirlar}</tbody><tfoot><tr><td colspan="5" style="padding:10px;text-align:right;font-size:.85rem;font-weight:700;color:#e02020">${toplamStr}</td><td></td></tr></tfoot></table></div>
+    </div>
+    ${not?`<div style="padding:0 24px 16px"><div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:.78rem;color:#92400e"><strong>Not:</strong> ${not}</div></div>`:''}
+    <div style="padding:14px 24px;background:#f9fafb;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div style="font-size:.68rem;color:#9ca3af">Şubat 2026 Tavsiye Edilen Perakende Fiyat Listesi baz alınmıştır.</div>
+      <div style="font-size:.68rem;color:#9ca3af">Mustafa Kemal Nalvuran · k.nalvuran@daikin.com.tr</div>
+    </div>
+  </div>`;
+  document.getElementById('teklif-cikti').innerHTML=html;
+  document.getElementById('teklif-cikti-section').style.display='block';
+  document.getElementById('teklif-cikti-section').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+document.getElementById('btn-pdf').addEventListener('click',function(){
+  const el=document.getElementById('teklif-yazdir');
+  if(!el){toast('Önce teklif oluşturun','error');return;}
+  const ef=document.getElementById('pdf-frame');if(ef)ef.remove();
+  const iframe=document.createElement('iframe');
+  iframe.id='pdf-frame';iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none';
+  document.body.appendChild(iframe);
+  const doc=iframe.contentWindow.document;
+  doc.open();
+  doc.write(`<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}.teklif-kartlar{display:none}.teklif-tablo-wrap{display:block}@page{margin:1cm}</style></head><body>${el.innerHTML}</body></html>`);
+  doc.close();
+  iframe.onload=function(){setTimeout(()=>{iframe.contentWindow.focus();iframe.contentWindow.print();},600);};
+});
+document.getElementById('btn-yeni-teklif').addEventListener('click',function(){teklifSepet=[];document.getElementById('teklif-musteri').value='';document.getElementById('teklif-not').value='';document.getElementById('teklif-section').style.display='none';document.getElementById('teklif-cikti-section').style.display='none';window.scrollTo({top:0,behavior:'smooth'});});
+document.getElementById('btn-sepet-temizle').addEventListener('click',function(){teklifSepet=[];renderTeklifSepet();document.getElementById('teklif-cikti-section').style.display='none';});
+document.getElementById('btn-teklif-olustur').addEventListener('click',teklifOlustur);
+document.getElementById('btn-teklife-ekle').addEventListener('click',teklifeEkle);
+
+renderCesitTabs();renderSeri();hesapla();
+</script>
+</body>
+</html>
